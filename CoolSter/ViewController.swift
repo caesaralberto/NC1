@@ -165,6 +165,7 @@ class ViewController: UIViewController {
                 }) { (_) in
                     if !self.flag{
                         self.spawnBall()
+                        print("mantul")
                     }
                 }
             }
