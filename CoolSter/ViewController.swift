@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import AudioToolbox
 
 extension UIColor{
     var shadeOrange: UIColor {return UIColor(displayP3Red: 248 / 255, green: 156 / 255, blue: 54 / 255, alpha: 1)}
@@ -16,35 +17,46 @@ extension UIColor{
 }
 
 class ViewController: UIViewController {
-    var flag = false
     //set rgb value roundOne
     var redOne: Float = 255/255
     var greenOne: Float = 255/255
     var blueOne: Float = 255/255
- 
+    
+    //for unwind segue
+    @IBAction func backVc(_ sender: UIStoryboardSegue){
+        
+    }
+    
     //declare label text
     @IBOutlet weak var orderLbl: UILabel!{
         didSet{
-            orderLbl.text = "Tap Me"
+            orderLbl.text = ""
         }
     }
     
     //declare round view one
     @IBOutlet weak var colorOne: UIView!{
         didSet{
+            colorOne.layer.frame = CGRect(x: 160, y: 400, width: 95, height: 95)
             colorOne.layer.cornerRadius = colorOne.frame.width / 2
-            colorOne.layer.backgroundColor = UIColor.init().roundOneColor.cgColor
         }
     }
     
+    //declare one view front color onwe
     @IBOutlet weak var backgroundView: UIView!{
         didSet{
+            backgroundView.layer.frame = CGRect(x: 160, y: 400, width: 95, height: 95)
             backgroundView.layer.cornerRadius = backgroundView.frame.width / 2
-            backgroundView.layer.backgroundColor = UIColor.init().roundOneColor.cgColor
         }
     }
     override func viewDidLoad() {
         super.viewDidLoad()
+    }
+    
+    //declare before appear
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
         //gradation color initialization
         let gradientLayer = CAGradientLayer()
         gradientLayer.frame = view.bounds
@@ -52,20 +64,18 @@ class ViewController: UIViewController {
         gradientLayer.startPoint = CGPoint(x: 0.5,y: 0)
         gradientLayer.endPoint = CGPoint(x: 0.5,y: 1)
         view.layer.insertSublayer(gradientLayer, at: 0)
-    }
-    
-    //declare before appear
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
         
-        //declare update before appear
+        //declare asset before appear
         colorOne.isHidden = false
         backgroundView.isHidden = false
         orderLbl.isHidden = false
         orderLbl.alpha = 1
+        backgroundView.layer.backgroundColor = UIColor.init().roundOneColor.cgColor
+        colorOne.layer.backgroundColor = UIColor.init().roundOneColor.cgColor
         
         //set view to beginning
         colorOne.transform = .identity
+        backgroundView.gestureRecognizers = .init()
         backgroundView.transform = .identity
         
         //when view one isClicked
@@ -81,17 +91,28 @@ class ViewController: UIViewController {
         }
         
         //show animation change label name
-        UIView.animate(withDuration: 1) {
-            self.orderLbl.text = "Hold"
+        UIView.animate(withDuration: 1, delay: 1.5, options: .curveLinear, animations: {
+            self.orderLbl.text = "Wait"
+            self.orderLbl.alpha = 0
+            
+        }) { (_) in
+            //play animate after label "wait" show
+            UIView.animate(withDuration: 1, delay: 0, options: .curveLinear, animations: {
+                self.orderLbl.alpha = 1
+                self.orderLbl.text = "Hold"
+                
+            }) { (_) in
+                //
+            }
         }
         
         //show animation round will moving and scaling
         UIView.animate(withDuration: 2, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.5, options: .curveEaseIn, animations: {
             
             let scaling = CGAffineTransform(scaleX: 2, y: 2)
-            let translating = CGAffineTransform(translationX: -2, y: 80)
-            //let x = CGAffineTransform(translationX: -2, y: 160)
-            
+            let translating = CGAffineTransform(translationX: 0, y: 80)
+        
+            self.colorOne.alpha = 1.0
             self.colorOne.transform = scaling.concatenating(translating)
             self.backgroundView.alpha = 1.0
             self.backgroundView.transform = scaling.concatenating(translating)
@@ -104,101 +125,37 @@ class ViewController: UIViewController {
         let tapGesture = UILongPressGestureRecognizer(target: self, action: #selector(self.changeColor))
         tapGesture.minimumPressDuration = 0
         self.backgroundView.addGestureRecognizer(tapGesture)
-        //self.colorOne.isUserInteractionEnabled = true
     }
     
     @objc func changeColor(gestureRecognizer: UILongPressGestureRecognizer){
-//        let redValue: Float = 250 / 255
-//        let greenValue: Float = 92 / 255
-//        let blueValue: Float = 100 / 255
-//        colorOne.backgroundColor = UIColor(displayP3Red: CGFloat(redValue), green: CGFloat(greenValue), blue: CGFloat(blueValue), alpha: 1)
-//        let redReduceValue: Float = 1 / 255
-//        let greenReduceValue: Float = 32.6 / 255
-//        let blueReduceValue: Float = 31 / 255
-//
-//        if gestureRecognizer.state == .changed {
-//            if self.redOne == redValue || self.greenOne == greenValue || self.blueOne == blueValue {
-//
-//                UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.5, options: .curveEaseIn, animations: {
-//
-//                    self.colorOne.frame = CGRect(x: -25, y: -25, width: self.view.frame.width + 50, height: self.view.frame.height + 50)
-//
-//                    self.colorOne.alpha = 0.8
-//                    self.orderLbl.isHidden = true
-//
-//                    self.orderLbl.text = "Congratulation"
-//                    self.orderLbl.frame = CGRect(x: 0, y: 190, width: 414, height: 51)
-//                    self.orderLbl.font = UIFont.systemFont(ofSize: 42)
-//
-//                    self.colorOne.bringSubviewToFront(self.orderLbl)
-//                    self.orderLbl.isHidden = false
-//
-//
-//                }) { (_) in
-//                    if !self.flag{
-//                        self.bola()
-//                    }
-//                }
-//            }else{
-//                self.redOne -= redReduceValue
-//                self.greenOne -= greenReduceValue
-//                self.blueOne -= blueReduceValue
-//            }
-//            self.colorOne.backgroundColor = UIColor(displayP3Red: CGFloat(self.redOne), green: CGFloat(self.greenOne), blue: CGFloat(self.blueOne), alpha: 1)
-//        }
+        //when hold view condition
         if gestureRecognizer.state == .changed {
-            if backgroundView.alpha < 0 {
-                UIView.animate(withDuration: 2, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1, options: .curveEaseIn, animations: {
-                    
-                    self.colorOne.frame = CGRect(x: -25, y: -25, width: self.view.frame.width + 50, height: self.view.frame.height + 50)
-                    
-                    self.colorOne.alpha = 0.8
+            //when alpha of backgorundView less than 0
+            if backgroundView.alpha > 0 {
+                UIView.animate(withDuration: 1.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1, options: .curveEaseInOut, animations: {
+                    self.colorOne.transform = CGAffineTransform(scaleX: 100, y: 100)
+
                     self.orderLbl.isHidden = true
-                    
-                    self.orderLbl.text = "Congratulations"
-                    self.orderLbl.frame = CGRect(x: 0, y: 190, width: 414, height: 51)
-                    self.orderLbl.font = UIFont.systemFont(ofSize: 42)
-                    
-                    self.colorOne.bringSubviewToFront(self.orderLbl)
-                    self.orderLbl.isHidden = false
 
                 }) { (_) in
-                    if !self.flag{
-                        self.spawnBall()
-                        print("mantul")
-                    }
                 }
-            }
-            else {
-                UIView.animate(withDuration: 2, delay: 0, options: .showHideTransitionViews, animations: {
-                    self.backgroundView.alpha -= 0.05
+                //vibrate when press
+                AudioServicesPlaySystemSound(1520)
+                UIView.animate(withDuration: 1, delay: 0, options: .transitionCurlUp, animations: {
+                    //alpha reducer
+                    self.backgroundView.alpha -= 0.09
                 }) { (_) in
                     //
                 }
             }
+            else {
+                //go to next page
+                performSegue(withIdentifier: "nextVc", sender: self)
+                self.orderLbl.text = ""
+                self.backgroundView.alpha = 1
+                self.colorOne.alpha = 1
+            }
         }
     }
-    
-    func spawnBall (){
-        for _ in 1...80 {
-            let randomX = Int.random(in: 0...400)
-            let randomY = Int.random(in: 300...880)
-            let shape = UIView(frame: CGRect(x: randomX, y: randomY, width: 25, height: 25))
-            
-            let shapeColor = [UIColor(displayP3Red: 233 / 255, green: 235 / 255, blue: 47 / 255, alpha: 1), UIColor(displayP3Red: 81 / 255, green: 180 / 255, blue: 144 / 255, alpha: 1), UIColor(displayP3Red: 46 / 255, green: 94 / 255, blue: 192 / 255, alpha: 1)]
-            
-            shape.backgroundColor = shapeColor.randomElement()
-            shape.layer.cornerRadius = shape.frame.width / 2
-            
-            UIView.animate(withDuration: 2, delay: 0, options: [.repeat, .autoreverse, .curveLinear, .transitionFlipFromRight, .transitionFlipFromLeft, .transitionCurlUp, .transitionCurlDown, .showHideTransitionViews], animations: {
-                shape.frame = CGRect(x: CGFloat.random(in: 0...400), y: CGFloat.random(in: 300...800), width: 25, height: 25)
-            }, completion: nil)
-            
-            self.view.addSubview(shape)
-            self.colorOne.bringSubviewToFront(shape)
-            flag = true
-        }
-    }
-    
 }
 
