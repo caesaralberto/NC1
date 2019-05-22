@@ -37,7 +37,6 @@ class ViewController: UIViewController {
     //declare round view one
     @IBOutlet weak var colorOne: UIView!{
         didSet{
-            colorOne.layer.frame = CGRect(x: 160, y: 400, width: 95, height: 95)
             colorOne.layer.cornerRadius = colorOne.frame.width / 2
         }
     }
@@ -45,7 +44,6 @@ class ViewController: UIViewController {
     //declare one view front color onwe
     @IBOutlet weak var backgroundView: UIView!{
         didSet{
-            backgroundView.layer.frame = CGRect(x: 160, y: 400, width: 95, height: 95)
             backgroundView.layer.cornerRadius = backgroundView.frame.width / 2
         }
     }
@@ -91,19 +89,24 @@ class ViewController: UIViewController {
         }
         
         //show animation change label name
-        UIView.animate(withDuration: 1, delay: 1.5, options: .curveLinear, animations: {
+        UIView.animate(withDuration: 1, delay: 1.5, options: .curveEaseOut, animations: {
             self.orderLbl.text = "Wait"
             self.orderLbl.alpha = 0
             
+            
         }) { (_) in
             //play animate after label "wait" show
-            UIView.animate(withDuration: 1, delay: 0, options: .curveLinear, animations: {
-                self.orderLbl.alpha = 1
+            UIView.animate(withDuration: 1, delay: 0, options: .curveEaseOut, animations: {
                 self.orderLbl.text = "Hold"
+                self.orderLbl.alpha = 1
                 
             }) { (_) in
                 //
             }
+            
+            UIView.animate(withDuration: 2.5, delay: 0, options: .transitionCurlDown, animations: {
+                
+            }, completion: nil)
         }
         
         //show animation round will moving and scaling
@@ -113,7 +116,7 @@ class ViewController: UIViewController {
             let translating = CGAffineTransform(translationX: 0, y: 80)
         
             self.colorOne.alpha = 1.0
-            self.colorOne.transform = scaling.concatenating(translating)
+            self.colorOne.transform = CGAffineTransform(scaleX: 50, y: 50)
             self.backgroundView.alpha = 1.0
             self.backgroundView.transform = scaling.concatenating(translating)
             
@@ -132,23 +135,21 @@ class ViewController: UIViewController {
         if gestureRecognizer.state == .changed {
             //when alpha of backgorundView less than 0
             if backgroundView.alpha > 0 {
-                UIView.animate(withDuration: 1.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1, options: .curveEaseInOut, animations: {
-                    self.colorOne.transform = CGAffineTransform(scaleX: 100, y: 100)
-
-                    self.orderLbl.isHidden = true
-
-                }) { (_) in
-                }
+                
                 //vibrate when press
                 AudioServicesPlaySystemSound(1520)
-                UIView.animate(withDuration: 1, delay: 0, options: .transitionCurlUp, animations: {
+                
+                //reduce alpha of background view
+                UIView.animate(withDuration: 1, delay: 0, options: .curveLinear, animations: {
                     //alpha reducer
                     self.backgroundView.alpha -= 0.09
                 }) { (_) in
                     //
                 }
-            }
-            else {
+                
+                //set hidden label
+                self.orderLbl.isHidden = true
+            }else {
                 //go to next page
                 performSegue(withIdentifier: "nextVc", sender: self)
                 self.orderLbl.text = ""
